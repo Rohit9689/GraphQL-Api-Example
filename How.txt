@@ -1,0 +1,73 @@
+When the user submits this form, the data might look like this in JSON format:
+
+{
+  "input": {
+    "title": "Learning GraphQL",
+    "author": "John Doe",
+    "description": "A comprehensive guide to GraphQL with practical examples.",
+    "price": 29.99,
+    "publisher": "Tech Books Publishing",
+    "edition": "2nd",
+    "reviews": [
+      { "rating": 5, "comment": "Excellent book!" },
+      { "rating": 4, "comment": "Very informative." }
+    ]
+  }
+}
+
+
+* What Happens After Submission:
+> The user submits this data through a GraphQL mutation, calling the createBook function.
+> The user expects:
+> The book to be created in the database.
+> The reviews to be associated with that book automatically.
+
+//---logic in resolver
+
+createBook: async (_, { input }) => {
+  const { reviews, ...bookData } = input;
+  return await db.Book.create(
+    {
+      ...bookData,
+      reviews, // Include reviews data
+    },
+    {
+      include: [{ model: db.Review, as: 'reviews' }] // Ensure reviews are created along with the book
+    }
+  );
+}
+
+1. Function Definition:
+
+createBook: async (_, { input }) => { ... }
+This is an asynchronous function designed to handle the creation of a new book.
+The input parameter contains all the data submitted by the user.
+
+2. Destructuring Input:
+
+const { reviews, ...bookData } = input;
+
+3. Creating the Book with Reviews:
+
+return await db.Book.create(
+  {
+    ...bookData,
+    reviews, // Include reviews data
+  },
+  {
+    include: [{ model: db.Review, as: 'reviews' }] // Ensure reviews are created along with the book
+  }
+);
+
+First Parameter:
+
+This object represents what will be inserted into the Book table.
+{ ...bookData, reviews } creates a new object that contains all the fields required for the book along with the reviews array. This means that when the book is created, it includes the reviews as part of the data.
+
+Second Parameter:
+
+This options object instructs Sequelize to handle the reviews relationship.
+include: [{ model: db.Review, as: 'reviews' }] tells Sequelize to also create entries in the Review table for each review provided in the reviews array.
+The as: 'reviews' matches the alias defined in the association between Book and Review
+
+

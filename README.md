@@ -1,1 +1,1 @@
-# GraphQL-Apis-Example
+# GraphQL-Api-Example
